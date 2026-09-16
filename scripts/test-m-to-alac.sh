@@ -290,6 +290,18 @@ refuse=$?
 set -e
 assert "refuse-same-root-nonzero" test "$refuse" -ne 0
 
+echo "== Lidarr paths outside MASTER_ROOT fail loudly =="
+make_flac "$WORKDIR/elsewhere/out.flac"
+set +e
+MASTER_ROOT="$MASTER" ALAC_ROOT="$ALAC" LOG_FILE="$LOG" COVER_ART_ARCHIVE=0 \
+  lidarr_eventtype=AlbumDownload \
+  lidarr_addedtrackpaths="$WORKDIR/elsewhere/out.flac" \
+  "$PY" "$SCRIPT"
+outside=$?
+set -e
+assert "outside-master-nonzero" test "$outside" -ne 0
+assert "outside-not-converted" test ! -f "$ALAC/elsewhere/out.m4a"
+
 echo "== Bulk two-arg roots (legacy SRC DST) =="
 bulk="$WORKDIR/bulk"
 bmaster="$bulk/m"

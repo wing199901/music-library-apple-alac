@@ -29,17 +29,37 @@ Need `ffmpeg` and `ffprobe` on PATH (`FFMPEG` / `FFPROBE` override).
 
 **Settings → Connect → + → Custom Script**
 
+Lidarr’s **Path** field must be an existing file (it does not accept `py script.py` as one string). Use Path + Arguments:
+
+| | Windows | Docker / Linux |
+| --- | --- | --- |
+| **Path** | `C:\path\to\scripts\m_to_alac.py` (associated with `py`) **or** `C:\Windows\py.exe` | `/scripts/m_to_alac.py` (shebang) **or** `/usr/bin/python3` |
+| **Arguments** | if Path is `py.exe`: `C:\path\to\scripts\m_to_alac.py` plus optional `--master-root M:\ --alac-root D:\Music-ALAC` | if Path is `python3`: `/scripts/m_to_alac.py` plus optional `--master-root /music --alac-root /music-alac` |
+
+Same commands outside Lidarr:
+
+```text
+# Windows
+py C:\path\to\scripts\m_to_alac.py
+python C:\path\to\scripts\m_to_alac.py
+
+# Docker
+python3 /scripts/m_to_alac.py
+```
+
 | | |
 | --- | --- |
 | Name | `m_to_alac` |
-| **Windows Path** | `py C:\path\to\music-library-apple-alac\scripts\m_to_alac.py` (or `python C:\path\to\…\scripts\m_to_alac.py`) |
-| **Docker Path** | `python3 /scripts/m_to_alac.py` (mount this repo’s `scripts/` at `/scripts`, and both music trees) |
 | On | **On Release Import** and **On Upgrade** only |
-| Test | must exit 0 (`m_to_alac: Test OK` on stdout) |
+| Test | must exit 0 (`m_to_alac: Test OK` on stdout; fails if ffmpeg/ffprobe missing) |
+
+Mount this repo’s `scripts/` at `/scripts` in Docker, and both music trees. `MASTER_ROOT` must be Lidarr’s library root (the prefix of `lidarr_addedtrackpaths`).
 
 On Import/Upgrade Lidarr sets `lidarr_eventtype=AlbumDownload` and `lidarr_addedtrackpaths` (pipe-separated). MusicBrainz **Release** ID is `lidarr_albumrelease_mbid` (not `lidarr_album_mbid`, which is the release group).
 
 Equivalent CLI flags: `--event AlbumDownload --added-tracks "a.flac|b.flac" --release-mbid <uuid>`.
+
+Lidarr Connect has no env-var editor; pass `--master-root` / `--alac-root` in **Arguments**, or set `MASTER_ROOT` / `ALAC_ROOT` / `LOG_FILE` / `COVER_ART_ARCHIVE` on the Lidarr process/container.
 
 ## Environment
 

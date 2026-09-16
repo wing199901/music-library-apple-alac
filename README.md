@@ -22,9 +22,13 @@ One entrypoint: **[scripts/m_to_alac.py](./scripts/m_to_alac.py)** (ASCII-safe).
 # Windows bulk overlay
 py scripts\m_to_alac.py
 
-# Lidarr Custom Script Path
-#   Windows:  py C:\path\to\scripts\m_to_alac.py
-#   Docker:   python3 /scripts/m_to_alac.py
+# Lidarr Custom Script (Path must be an existing file)
+#   Windows Path:  C:\path\to\scripts\m_to_alac.py
+#     or Path py.exe  Arguments: C:\path\to\scripts\m_to_alac.py
+#   Docker Path:   /scripts/m_to_alac.py
+#     or Path /usr/bin/python3  Arguments: /scripts/m_to_alac.py
+# Interactive:     py C:\path\to\scripts\m_to_alac.py
+#                  python3 /scripts/m_to_alac.py
 ```
 
 Env: `MASTER_ROOT`, `ALAC_ROOT`, `LOG_FILE`, `COVER_ART_ARCHIVE`. Details: [scripts/README.md](./scripts/README.md).

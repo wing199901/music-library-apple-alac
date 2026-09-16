@@ -123,9 +123,11 @@ CFG = None
 CONVERT_OK = 0
 CONVERT_SKIP = 0
 CONVERT_FAIL = 0
+OUTSIDE_MASTER = 0
 COVER_OK = 0
 COVER_SKIP = 0
 COVER_NONE = 0
+COVER_FAIL = 0
 
 
 class Config(object):
@@ -679,7 +681,8 @@ def embed_cover(dest, cover):
 
 
 def process_source(raw):
-    global CONVERT_OK, CONVERT_SKIP, CONVERT_FAIL, COVER_OK, COVER_SKIP, COVER_NONE
+    global CONVERT_OK, CONVERT_SKIP, CONVERT_FAIL, OUTSIDE_MASTER
+    global COVER_OK, COVER_SKIP, COVER_NONE, COVER_FAIL
     raw = Path(raw)
     if not raw.is_file():
         log("SKIP_MISSING %s" % raw)
@@ -699,6 +702,7 @@ def process_source(raw):
     if dest is None:
         log("SKIP_OUTSIDE_MASTER %s master=%s" % (src, CFG.master_root))
         CONVERT_SKIP += 1
+        OUTSIDE_MASTER += 1
         return
     if not assert_dest_safe(dest):
         CONVERT_FAIL += 1
@@ -734,7 +738,7 @@ def process_source(raw):
         log("COVER_OK kind=%s dest=%s" % (kind, dest))
     else:
         log("COVER_FAIL kind=%s dest=%s (convert kept; embed non-fatal)" % (kind, dest))
-        COVER_NONE += 1
+        COVER_FAIL += 1
 
 
 def process_path_arg(path):
@@ -747,10 +751,18 @@ def process_path_arg(path):
         process_source(path)
 
 
-def require_tools():
-    for bin_name in (ffmpeg_bin(), ffprobe_bin()):
+def missing_tools():
+    missing = []
+    for bin_name in (env_first("FFMPEG") or "ffmpeg", env_first("FFPROBE") or "ffprobe"):
         if shutil.which(bin_name) is None and not Path(bin_name).is_file():
-            die("ffmpeg/ffprobe not found (%s)" % bin_name)
+            missing.append(bin_name)
+    return missing
+
+
+def require_tools():
+    missing = missing_tools()
+    if missing:
+        die("ffmpeg/ffprobe not found (%s)" % ", ".join(missing))
 
 
 def init_config(master_root, alac_root, quiet, release_mbid):
@@ -827,15 +839,20 @@ def looks_like_audio(path):
 
 
 def main(argv=None):
-    global CONVERT_OK, CONVERT_SKIP, CONVERT_FAIL, COVER_OK, COVER_SKIP, COVER_NONE
-    CONVERT_OK = CONVERT_SKIP = CONVERT_FAIL = 0
-    COVER_OK = COVER_SKIP = COVER_NONE = 0
+    global CONVERT_OK, CONVERT_SKIP, CONVERT_FAIL, OUTSIDE_MASTER
+    global COVER_OK, COVER_SKIP, COVER_NONE, COVER_FAIL
+    CONVERT_OK = CONVERT_SKIP = CONVERT_FAIL = OUTSIDE_MASTER = 0
+    COVER_OK = COVER_SKIP = COVER_NONE = COVER_FAIL = 0
 
     args = build_parser().parse_args(argv)
     event = lidarr_event(args.event)
 
     if event == "Test":
         # stdout only. Lidarr records stderr as Error.
+        missing = missing_tools()
+        if missing:
+            print("m_to_alac: Test FAIL missing %s" % ", ".join(missing))
+            return 1
         print("m_to_alac: Test OK")
         return 0
 
@@ -900,9 +917,26 @@ def main(argv=None):
             return 2
 
         log(
-            "DONE ok=%s skip=%s fail=%s cover_ok=%s cover_skip=%s cover_none=%s"
-            % (CONVERT_OK, CONVERT_SKIP, CONVERT_FAIL, COVER_OK, COVER_SKIP, COVER_NONE)
+            "DONE ok=%s skip=%s fail=%s outside=%s cover_ok=%s cover_skip=%s cover_none=%s cover_fail=%s"
+            % (
+                CONVERT_OK,
+                CONVERT_SKIP,
+                CONVERT_FAIL,
+                OUTSIDE_MASTER,
+                COVER_OK,
+                COVER_SKIP,
+                COVER_NONE,
+                COVER_FAIL,
+            )
         )
+        if event == "AlbumDownload" and CONVERT_OK == 0 and CONVERT_FAIL == 0 and OUTSIDE_MASTER > 0:
+            err = (
+                "ERROR no tracks under MASTER_ROOT "
+                "(set MASTER_ROOT / --master-root to Lidarr library root)"
+            )
+            log(err)
+            print(err, file=sys.stderr, flush=True)
+            return 1
         if CONVERT_FAIL:
             return 1
         return 0

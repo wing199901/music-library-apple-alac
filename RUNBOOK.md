@@ -131,10 +131,12 @@ After the one-shot campaign, keep the ALAC mirror in sync as Lidarr imports or u
 
 1. Install `ffmpeg` / `ffprobe` where Lidarr runs (Python 3 as well; Windows: the `py` launcher).
 2. Set `MASTER_ROOT` (`/music` or `M:\`) and `ALAC_ROOT` (`/music-alac` or `D:\Music-ALAC`). Never point `ALAC_ROOT` at the FLAC/master tree.
-3. Lidarr **Settings → Connect → Custom Script**:
-   - Windows: `py C:\path\to\scripts\m_to_alac.py` (or `python …\scripts\m_to_alac.py`)
-   - Docker: `python3 /scripts/m_to_alac.py`
-   - Enable **On Release Import** and **On Upgrade**. Test must exit 0.
+3. Lidarr **Settings → Connect → Custom Script** (Path must be an existing file, not `py script.py` as one string):
+   - Windows Path: `C:\path\to\scripts\m_to_alac.py` (or Path `py.exe` / `python.exe`, Arguments `C:\path\to\scripts\m_to_alac.py`)
+   - Docker Path: `/scripts/m_to_alac.py` (or Path `/usr/bin/python3`, Arguments `/scripts/m_to_alac.py`)
+   - Optional Arguments: `--master-root M:\ --alac-root D:\Music-ALAC` (Docker: `--master-root /music --alac-root /music-alac`)
+   - Enable **On Release Import** and **On Upgrade**. Test must exit 0 (`m_to_alac: Test OK`).
+   - Interactive equivalents: `py C:\path\to\scripts\m_to_alac.py` and `python3 /scripts/m_to_alac.py`.
 4. The script converts `lidarr_addedtrackpaths` (prefer `.flac`; skip lossy) to the same relative path under `ALAC_ROOT` as `.m4a`, then embeds cover using the priority in **B**. Same via CLI `--event` / `--added-tracks` / `--release-mbid`.
 5. Log file: `$ALAC_ROOT/_m_to_alac.log` (override with `LOG_FILE`). `COVER_ART_ARCHIVE=0` disables Cover Art Archive. Missing art logs `COVER_NONE` and does **not** fail the import.
 6. **Apple Music is still manual:** File → Add Folder to Library on the ALAC root (or Delete from Library + re-Add for that album). Sync Library does not watch the folder by itself.
