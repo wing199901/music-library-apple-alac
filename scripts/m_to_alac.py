@@ -159,12 +159,14 @@ class Config(object):
 
 
 def default_master_root():
+    """Platform default MASTER_ROOT when env/argv are unset."""
     if os.name == "nt":
         return Path("M:\\")
     return Path("/music")
 
 
 def default_alac_root():
+    """Platform default ALAC_ROOT when env/argv are unset."""
     if os.name == "nt":
         return Path("D:\\Music-ALAC")
     return Path("/music-alac")
