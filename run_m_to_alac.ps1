@@ -167,6 +167,6 @@ if __name__ == "__main__":
 '@
 [IO.File]::WriteAllText($py, $code)
 Write-Host "Wrote $py size=$((Get-Item -LiteralPath $py).Length)"
-New-Item -ItemType Directory -Force -Path 'D:\u005cMusic-ALAC' | Out-Null
-& py -3 $py 'M:\u005c' 'D:\u005cMusic-ALAC'
+New-Item -ItemType Directory -Force -Path 'D:\Music-ALAC' | Out-Null
+& py -3 $py 'M:\' 'D:\Music-ALAC'
 exit $LASTEXITCODE
