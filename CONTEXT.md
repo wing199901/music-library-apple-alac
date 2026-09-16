@@ -15,7 +15,8 @@
 | **Add Folder / Update Cloud Library** | Apple ingest path on Windows (preferred over Auto-Add for this campaign). |
 | **Batch converter** | `ffmpeg -c:a alac` → `.m4a` (temp `*.partial.m4a` + `-f mp4`). |
 | **Verify (pre-Apple)** | File-count / total-size report (source lossless vs ALAC) plus sampled `ffprobe` (codec=alac, duration ≈ source). |
-| **Cover embed** | Write attached_pic into existing `.m4a` (`-c:a copy`); required for Apple Music unmatched art. |
+| **Cover embed** | Write attached_pic into existing `.m4a` (`-c:a copy`); required for Apple Music unmatched art. Priority: source embedded pic → `cover.jpg` → `folder.jpg` → named Lidarr folder art (larger wins) → Cover Art Archive (MusicBrainz Release ID only) → skip. |
+| **m_to_alac.py** | One CLI (`scripts/m_to_alac.py`): bulk overlay of `MASTER_ROOT` → `ALAC_ROOT`, and Lidarr Custom Script (On Release Import / On Upgrade). Windows: `py`. Apple Music Add Folder remains manual. |
 
 ## Settled for this campaign
 
