@@ -8,6 +8,7 @@ Practical runbook for keeping **lossless masters** (e.g. Lidarr / FLAC) and feed
 - **[scripts/README.md](./scripts/README.md)** — one Python CLI: bulk overlay + Lidarr Custom Script
 - **[CONTEXT.md](./CONTEXT.md)** — glossary
 - **[docs/adr/](./docs/adr/)** — short architecture decision records
+- **[docs/PLAYLIST_RESTORE_RUNBOOK.md](./docs/PLAYLIST_RESTORE_RUNBOOK.md)** — Apple Music playlist restore from local jsonl (Mac)
 
 ## What this is / isn’t
 

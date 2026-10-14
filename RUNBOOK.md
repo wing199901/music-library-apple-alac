@@ -1,6 +1,6 @@
 # Runbook — Lidarr FLAC → ALAC mirror → Apple Music (Windows)
 
-A **runbook** is an operations checklist: what we decided, what we ran, how to repeat it, and known failure modes. Follow this when re-converting, refreshing covers, or onboarding another machine.
+A **runbook** is an operations checklist: what we decided, what we ran, how to repeat it, and known failure modes. Follow this when re-converting, refreshing covers, or onboarding another machine. Playlist catalog restore on the Mac: [docs/PLAYLIST_RESTORE_RUNBOOK.md](./docs/PLAYLIST_RESTORE_RUNBOOK.md).
 
 Example layout from a Windows + Lidarr campaign (adapt drive letters).  
 Reference campaign completed successfully after convert → verify → cover embed → Add Folder.
